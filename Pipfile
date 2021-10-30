@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==3.2.8"
+django-cors-headers = "==3.10.0"
+django-debug-toolbar = "==3.2.2"
+django-heroku = "==0.3.1"
+djangorestframework = "==3.12.4"
+djangorestframework-simplejwt = "==5.0.0"
+psycopg2 = "==2.9.1"
+
+[dev-packages]
+ipython = "*"
+pre-commit = "*"
+black = "==21.9b0"
+isort = "*"
+
+[requires]
+python_version = "3.9"
