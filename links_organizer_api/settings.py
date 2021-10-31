@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-# from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 from os import getenv
 
@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
-    'debug_toolbar',
+    "djangoql",
+    "debug_toolbar",
+    "drf_yasg",
+    "django_filters",
     # local apps
     'accounts',
 ]
@@ -144,3 +147,53 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 AUTHENTICATION_BACKENDS = ("accounts.auth.EmailOrUsernameModelBackend",)
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "links_organizer_api.utils.exceptions.exception_handler",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PAGINATION_CLASS": "links_organizer_api.utils.paginations.CustomLimitOffsetPagination",
+}
+
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
+    "UPDATE_LAST_LOGIN": True,
+    "LEEWAY": timedelta(seconds=60),
+}
+
+SWAGGER_SETTINGS = {
+    "DEFAULT_INFO": "flaam_api.urls.api_info",
+    "USE_SESSION_AUTH": False,
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+}
+
+# FRONTEND_URL = ""
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+PASSWORD_RESET_TIMEOUT = 10 * 60  # seconds
+
+# Heroku Settings

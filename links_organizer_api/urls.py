@@ -16,7 +16,28 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
-# from rest_framework import permissions
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+
+admin.site.site_header = "Links Organizer"
+admin.site.site_title = "Links Organizer"
+
+api_info = openapi.Info(
+    title="Links Organizer API",
+    default_version="v1",
+    description="API for Links Organizer",
+    terms_of_service="",
+    contact=openapi.Contact(email=""),
+    license=openapi.License(name=""),
+)
+
+schema_view = get_schema_view(
+    api_info,
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 api_v1_urlpatterns = [
     path("accounts/", include("accounts.urls"), name="accounts"),
@@ -35,5 +56,15 @@ if settings.DEBUG:
             path("api-auth", include("rest_framework.urls")),
             # debug_toolbar
             path("__debug__/", include(debug_toolbar.urls), name="debug_toolbar"),
+            path(
+                "swagger",
+                schema_view.with_ui("swagger", cache_timeout=0),
+                name="schema-swagger-ui",
+            ),
+            path(
+                "redoc",
+                schema_view.with_ui("redoc", cache_timeout=0),
+                name="schema-redoc",
+            ),
         ]
     )
