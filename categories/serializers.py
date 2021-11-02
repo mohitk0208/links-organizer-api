@@ -11,6 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = (
           'id',
           'name',
+          'description',
           'owner',
           'owner_username',
           'owner_avatar',
