@@ -41,6 +41,7 @@ schema_view = get_schema_view(
 
 api_v1_urlpatterns = [
     path("accounts/", include("accounts.urls"), name="accounts"),
+    path("", include("categories.urls"), name="categories"),
 ]
 
 urlpatterns = [
