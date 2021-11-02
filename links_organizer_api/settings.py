@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "django_filters",
     # local apps
     'accounts',
-    'categories'
+    'categories',
+    'tags'
 ]
 
 MIDDLEWARE = [
