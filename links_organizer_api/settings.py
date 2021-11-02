@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     # local apps
     'accounts',
     'categories',
-    'tags'
+    'tags',
+    'links'
 ]
 
 MIDDLEWARE = [
