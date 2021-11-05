@@ -203,3 +203,7 @@ FILTERS_NULL_CHOICE_VALUE = "null"
 FILTERS_NULL_CHOICE_LABEL = "None"
 
 # Heroku Settings
+if getenv("HEROKU_ENVIRONMENT"):
+    import django_heroku
+
+    django_heroku.settings(locals())
