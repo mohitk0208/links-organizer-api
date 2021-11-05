@@ -186,7 +186,7 @@ SWAGGER_SETTINGS = {
     },
 }
 
-FRONTEND_URL = "https://links-organizer-react.pages.dev"
+FRONTEND_URL = "https://links-organizer-react.pages.dev/"
 
 INTERNAL_IPS = [
     "localhost",
