@@ -186,11 +186,11 @@ SWAGGER_SETTINGS = {
     },
 }
 
-# FRONTEND_URL = ""
+FRONTEND_URL = "https://links-organizer-react.pages.dev"
 
 INTERNAL_IPS = [
-    "127.0.0.1",
     "localhost",
+    FRONTEND_URL,
 ]
 
 CORS_ALLOWED_ORIGINS = [
