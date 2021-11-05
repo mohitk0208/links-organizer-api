@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from drf_yasg.utils import swagger_auto_schema
 
+from django.db import IntegrityError
+from rest_framework.exceptions import ValidationError
+
 from .serializers import CategorySerializer
 from .models import Category
 
@@ -13,17 +16,19 @@ class CategoryListView(ListCreateAPIView):
     """
 
     serializer_class = CategorySerializer
-
-    def get_queryset(self):
-        return Category.objects.filter(owner=self.request.user)
-
     ordering = ('-created_at')
     filter_fields = ('parent_category',)
     search_fields = ('name', 'description')
     odering_fields = ('created_at', 'updated_at', 'name')
 
+    def get_queryset(self):
+        return Category.objects.filter(owner=self.request.user)
+
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        try:
+            serializer.save(owner=self.request.user)
+        except IntegrityError:
+            raise ValidationError({"name": ["Category already exists"]})
 
     @swagger_auto_schema(
         tags=('categories',),
