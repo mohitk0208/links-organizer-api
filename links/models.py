@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class Link(models.Model):
-    url = models.URLField(max_length=200, unique=True)
+    url = models.URLField(max_length=200)
     description = models.TextField(max_length=300, blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ForeignKey('categories.Category', on_delete=models.CASCADE)
