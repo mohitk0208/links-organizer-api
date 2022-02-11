@@ -12,6 +12,7 @@ class CategorySerializer(serializers.ModelSerializer):
           'id',
           'name',
           'description',
+          'background_url',
           'owner',
           'owner_username',
           'owner_avatar',

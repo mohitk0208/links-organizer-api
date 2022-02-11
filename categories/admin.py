@@ -9,6 +9,7 @@ class CategoryAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
         'id',
         'name',
         'description',
+        'background_url',
         'parent_category',
         'owner',
         'created_at',
