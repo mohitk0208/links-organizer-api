@@ -7,6 +7,7 @@ from tags.serializers import TagSerializer
 class LinkSerializer(serializers.ModelSerializer):
     owner__username = serializers.ReadOnlyField(source='owner.username')
     owner__avatar = serializers.ReadOnlyField(source='owner.avatar')
+    category__background_url = serializers.ReadOnlyField(source='category.background_url')
     # tags = TagSerializer(many=True)
 
     def to_representation(self, instance):
@@ -20,6 +21,7 @@ class LinkSerializer(serializers.ModelSerializer):
           'id',
           'url',
           'category',
+          'category__background_url',
           'description',
           'owner',
           'owner__username',
