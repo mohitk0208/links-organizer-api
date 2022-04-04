@@ -16,6 +16,7 @@ drf-yasg = "*"
 gunicorn = "*"
 psycopg2 = "*"
 coverage = "*"
+tblib = "*"
 
 [dev-packages]
 ipython = "*"
