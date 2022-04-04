@@ -32,7 +32,11 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
+    @staticmethod
+    def generate_avatar(email):
+        return f"https://avatars.dicebear.com/api/identicon/{email}.svg"
+
     def save(self, *args, **kwargs):
         if not self.avatar:
-            self.avatar = f"https://avatars.dicebear.com/api/identicon/{self.email}.svg"
+            self.avatar = User.generate_avatar(self.email)
         super().save(*args, **kwargs)
