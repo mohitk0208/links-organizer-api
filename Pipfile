@@ -15,6 +15,7 @@ djangorestframework-simplejwt = "<=5.1"
 drf-yasg = "*"
 gunicorn = "*"
 psycopg2 = "*"
+coverage = "*"
 
 [dev-packages]
 ipython = "*"
