@@ -181,7 +181,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
     "UPDATE_LAST_LOGIN": True,
-    "LEEWAY": timedelta(seconds=60),
+    "LEEWAY": 60,
 }
 
 SWAGGER_SETTINGS = {
