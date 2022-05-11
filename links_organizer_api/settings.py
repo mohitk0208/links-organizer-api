@@ -185,7 +185,7 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
-    "DEFAULT_INFO": "flaam_api.urls.api_info",
+    "DEFAULT_INFO": "links_organizer_api.urls.api_info",
     "USE_SESSION_AUTH": False,
     "SECURITY_DEFINITIONS": {
         "Bearer": {
