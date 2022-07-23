@@ -103,13 +103,13 @@ DATABASES = {
     }
 }
 
-if getenv("CURRENT_ENV") == "development":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": "mydatabase",
-        }
-    }
+# if getenv("CURRENT_ENV") == "development":
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": "mydatabase",
+#         }
+#     }
 
 
 # Password validation
