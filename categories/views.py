@@ -1,13 +1,12 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.response import Response
-from rest_framework.request import Request
-from drf_yasg.utils import swagger_auto_schema
-
 from django.db import IntegrityError
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-from .serializers import CategorySerializer
 from .models import Category
+from .serializers import CategorySerializer
 
 
 class CategoryListView(ListCreateAPIView):
@@ -19,7 +18,7 @@ class CategoryListView(ListCreateAPIView):
     ordering = ('-created_at')
     filter_fields = ('parent_category',)
     search_fields = ('name', 'description')
-    odering_fields = ('created_at', 'updated_at', 'name')
+    ordering_fields = ('created_at', 'updated_at', 'name')
 
     def get_queryset(self):
         return Category.objects.filter(owner=self.request.user)
