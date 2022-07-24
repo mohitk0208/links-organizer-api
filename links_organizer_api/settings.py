@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "categories",
     "tags",
     "links",
+    "invitations",
 ]
 
 MIDDLEWARE = [
@@ -91,10 +92,9 @@ WSGI_APPLICATION = "links_organizer_api.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": getenv("DB_NAME"),
         "USER": getenv("DB_USER"),
         "PASSWORD": getenv("DB_PASSWORD"),
