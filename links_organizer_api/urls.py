@@ -13,13 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.conf import settings
+from django.contrib import admin
 from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-
 
 admin.site.site_header = "Links Organizer"
 admin.site.site_title = "Links Organizer"
@@ -44,6 +43,7 @@ api_v1_urlpatterns = [
     path("", include("categories.urls"), name="categories"),
     path("", include("tags.urls"), name="tags"),
     path("", include("links.urls"), name="links"),
+    path("", include("invitations.urls"), name="invitations"),
 ]
 
 urlpatterns = [
