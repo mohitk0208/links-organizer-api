@@ -2,9 +2,11 @@ from django.shortcuts import render
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 
+from categories.models import Category
 from links_organizer_api.utils.mixins import GetSerializerClassMixin
 from links_organizer_api.utils.serializers import EmptySerializer
 
@@ -42,6 +44,18 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
         return CategoryInvitation.objects.filter(receiver=self.request.user)
 
     def perform_create(self, serializer):
+        # Check if the requesting user is the owner of the category
+        try:
+            obj = Category.objects.get(
+                owner=self.request.user.id, id=self.request.data["category"]
+            )
+        except Category.DoesNotExist:
+            raise ValidationError("Category does not exist")
+
+        # Check if the sender and the receiver are not the same
+        if self.request.user.id == self.request.data["receiver"]:
+            raise ValidationError("You can't invite yourself")
+
         serializer.save(sender=self.request.user)
 
     @swagger_auto_schema(

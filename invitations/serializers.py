@@ -7,12 +7,19 @@ from .models import CategoryInvitation
 class BasicCategoryInvitationSerializer(serializers.ModelSerializer):
     sender_username = serializers.ReadOnlyField(source="sender.username")
     receiver_username = serializers.ReadOnlyField(source="receiver.username")
+    sender = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault()
+    )
+    category_name = serializers.ReadOnlyField(source="category.name")
+    category_description = serializers.ReadOnlyField(source="category.description")
 
     class Meta:
         model = CategoryInvitation
         fields = (
             "id",
             "category",
+            "category_name",
+            "category_description",
             "sender",
             "sender_username",
             "receiver",
@@ -32,21 +39,10 @@ class BasicCategoryInvitationSerializer(serializers.ModelSerializer):
             ),
         ]
 
-    def validate(self, attrs):
-        """
-        Check if the category is owned by the sender.
-        """
-        if attrs["category"].owner != attrs["sender"]:
-            raise serializers.ValidationError(
-                "You can't invite someone else to a category you don't own."
-            )
-
-        return attrs
-
 
 class CategoryInvitationListCreateSerializer(BasicCategoryInvitationSerializer):
     class Meta(BasicCategoryInvitationSerializer.Meta):
-        read_only_fields = ("id", "sender", "is_accepted", "created_at", "updated_at")
+        read_only_fields = ("id", "is_accepted", "created_at", "updated_at")
 
 
 class CategoryInvitationDetailSerializer(BasicCategoryInvitationSerializer):
