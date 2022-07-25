@@ -38,7 +38,7 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
     }
 
     def get_queryset(self):
-        if self.action == "destroy":
+        if self.action in ["destroy", "sent_invitations"]:
             return CategoryInvitation.objects.filter(sender=self.request.user)
 
         return CategoryInvitation.objects.filter(receiver=self.request.user)
@@ -93,3 +93,8 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
         invitation.save()
 
         return Response(status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def sent_invitations(self, request, *args, **kwargs):
+        """Get all sent invitations"""
+        return self.list(request, *args, **kwargs)
