@@ -15,7 +15,7 @@ class CategoryInvitation(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="receiver"
     )
     category = models.ForeignKey("categories.Category", on_delete=models.CASCADE)
-    is_accepted = models.BooleanField(blank=True, default=None)
+    is_accepted = models.BooleanField(blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
