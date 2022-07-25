@@ -1,8 +1,10 @@
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 
@@ -36,6 +38,10 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
         "accept": EmptySerializer,
         "reject": EmptySerializer,
     }
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
 
     def get_queryset(self):
         if self.action in ["destroy", "sent_invitations"]:
@@ -57,6 +63,11 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
             raise ValidationError("You can't invite yourself")
 
         serializer.save(sender=self.request.user)
+
+    def perform_destroy(self, instance):
+        if instance.is_accepted != None:
+            raise ValidationError("User has already responded this invitation.")
+        instance.delete()
 
     @swagger_auto_schema(
         operation_summary="Accept a category invitation",
