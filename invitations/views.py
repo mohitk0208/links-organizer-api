@@ -68,7 +68,13 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
     def accept(self, request, pk=None):
         """Accept invitation"""
         invitation = self.get_object()
+        if invitation.is_accepted is not None:
+            raise ValidationError("Already responded to invitation")
+
         invitation.is_accepted = True
+        invitation_category = Category.objects.get(id=invitation.category.id)
+        invitation_category.shared_users.add(invitation.receiver)
+        invitation_category.save()
         invitation.save()
 
         return Response(status=status.HTTP_200_OK)
@@ -80,6 +86,9 @@ class CategoryInvitationViewSet(BaseCategoryInvitationViewSet):
     def reject(self, request, pk=None):
         """Reject invitation"""
         invitation = self.get_object()
+        if invitation.is_accepted is not None:
+            raise ValidationError("Already responded to invitation")
+
         invitation.is_accepted = False
         invitation.save()
 
