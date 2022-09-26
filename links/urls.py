@@ -1,11 +1,9 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    LinkListView,
-    LinkDetailView,
-)
+from .views import LinksViewSet
 
-urlpatterns = [
-    path("links", LinkListView.as_view(), name="links"),
-    path("links/<int:pk>", LinkDetailView.as_view(), name="link"),
-]
+router = DefaultRouter()
+router.register(r"links", LinksViewSet, basename="links")
+
+urlpatterns = router.urls

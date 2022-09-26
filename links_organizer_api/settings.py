@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "categories",
     "tags",
     "links",
+    "invitations",
 ]
 
 MIDDLEWARE = [
@@ -91,10 +92,9 @@ WSGI_APPLICATION = "links_organizer_api.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": getenv("DB_NAME"),
         "USER": getenv("DB_USER"),
         "PASSWORD": getenv("DB_PASSWORD"),
@@ -103,13 +103,13 @@ DATABASES = {
     }
 }
 
-if getenv("CURRENT_ENV") == "development":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": "mydatabase",
-        }
-    }
+# if getenv("CURRENT_ENV") == "development":
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": "mydatabase",
+#         }
+#     }
 
 
 # Password validation
@@ -185,7 +185,7 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
-    "DEFAULT_INFO": "flaam_api.urls.api_info",
+    "DEFAULT_INFO": "links_organizer_api.urls.api_info",
     "USE_SESSION_AUTH": False,
     "SECURITY_DEFINITIONS": {
         "Bearer": {

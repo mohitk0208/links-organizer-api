@@ -1,11 +1,9 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    TagDetailView,
-    TagListView,
-)
+from .views import TagViewSet
 
-urlpatterns = [
-    path("tags", TagListView.as_view(), name="tags"),
-    path("tags/<int:pk>", TagDetailView.as_view(), name="tag"),
-]
+router = DefaultRouter()
+router.register("tags", TagViewSet, basename="tags")
+
+urlpatterns = router.urls

@@ -1,5 +1,5 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 
 class Link(models.Model):
@@ -15,6 +15,9 @@ class Link(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['url', 'owner'], name='unique_link_owner')
         ]
+
+    def get_category(self):
+        return self.category
 
     def __str__(self):
         return self.url
