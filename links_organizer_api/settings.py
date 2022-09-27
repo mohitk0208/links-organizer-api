@@ -205,7 +205,7 @@ INTERNAL_IPS = [
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
-    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 PASSWORD_RESET_TIMEOUT = 10 * 60  # seconds
