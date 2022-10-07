@@ -35,8 +35,7 @@ class TagViewSet(
         tag_name = self.request.query_params.get("name", None)
         if tag_name:
             vector = SearchVector("name")  # + SearchVector("description")
-            tags = Tag.objects.annotate(search=vector).filter(
+            return Tag.objects.annotate(search=vector).filter(
                 search__icontains=tag_name
             )
-        return tags
-
+        return Tag.objects.all()
