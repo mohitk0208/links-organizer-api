@@ -13,7 +13,7 @@ class LinksViewSet(viewsets.ModelViewSet):
     ordering = ("-created_at",)
     filter_fields = (
         "category",
-        "tags",
+        # "tags",
     )
     search_fields = (
         "description",
@@ -25,6 +25,19 @@ class LinksViewSet(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
+        if self.action != "list":
+            return Link.objects.filter(owner=self.request.user).prefetch_related("tags")
+
+        ids = self.request.query_params.get("tags", None)
+        if ids:
+            ids = ids.split(",")
+            links = Link.objects.filter(owner=self.request.user).prefetch_related(
+                "tags"
+            )
+            for id_ in ids:
+                links = links.filter(tags__id=id_)
+            return links
+
         return Link.objects.filter(owner=self.request.user).prefetch_related("tags")
 
     def perform_create(self, serializer):
