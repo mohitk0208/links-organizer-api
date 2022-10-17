@@ -17,7 +17,9 @@ class CategoryAccessSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     owner_username = serializers.ReadOnlyField(source="owner.username")
     owner_avatar = serializers.ReadOnlyField(source="owner.avatar")
-    shared_users = CategoryAccessSerializer(source="categoryaccess_set", many=True)
+    shared_users = CategoryAccessSerializer(
+        source="categoryaccess_set", read_only=True, many=True
+    )
 
     class Meta:
         model = Category
