@@ -23,6 +23,7 @@ ipython = "*"
 pre-commit = "*"
 black = "==21.9b0"
 isort = "*"
+redgreenunittest = "*"
 
 [requires]
 python_version = "3.10"

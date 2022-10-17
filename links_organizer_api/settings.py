@@ -218,3 +218,5 @@ if getenv("HEROKU_ENVIRONMENT"):
     import django_heroku
 
     django_heroku.settings(locals())
+
+TEST_RUNNER="redgreenunittest.django.runner.RedGreenDiscoverRunner"
