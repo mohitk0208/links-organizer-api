@@ -7,6 +7,8 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from accounts.models import User
 from accounts.views import (
     DecoratedTokenObtainPairView,
+    PublicUserProfileView,
+    UserExistsView,
     UserProfileView,
     UserRegisterView,
 )
@@ -45,13 +47,27 @@ class AccountsApiTests(TestCase):
             username="test", password="test", email="test@test.com", first_name="test"
         )
 
-    # def test_user_exists(self):
-    #     request = self.factory.post(
-    #         "/api/accounts/user/exists",
-    #         {
-    #             "username": "test",
-    #             "password": "test",
-    #             "email": "
+    def test_user_exists_by_username(self):
+        request = self.factory.get(f"/api/accounts/user/exists?username={self.user.username}", format="json")
+        response = UserExistsView.as_view()(request)
+        self.assertEqual(response.status_code, 204 )
+
+    def test_user_exists_by_email(self):
+        request = self.factory.get(f"/api/accounts/user/exists?email={self.user.email}", format="json")
+        response = UserExistsView.as_view()(request)
+        self.assertEqual(response.status_code, 204 )
+
+    def test_user_exits_false(self):
+        request = self.factory.get(f"/api/accounts/user/exists?username=notfound", format="json")
+        response = UserExistsView.as_view()(request)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_exists_no_username_or_email_provided(self):
+        request = self.factory.get(f"/api/accounts/user/exists", format="json")
+        response = UserExistsView.as_view()(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["detail"], "Provide either username or email")
+
 
     def test_user_can_login(self):
         request = self.factory.post(
@@ -75,6 +91,38 @@ class AccountsApiTests(TestCase):
         self.assertEqual(response.data["first_name"], self.user.first_name)
         self.assertEqual(response.data["last_name"], self.user.last_name)
         self.assertEqual(response.data["avatar"], self.user.avatar)
+
+    def test_get_public_profile(self):
+        request = self.factory.get(f"/api/accounts/user/{self.user.id}", format="json")
+        force_authenticate(request, user=self.user)
+        response = PublicUserProfileView.as_view()(request, pk=self.user.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["username"], self.user.username)
+        self.assertEqual(response.data["first_name"], self.user.first_name)
+        self.assertEqual(response.data["last_name"], self.user.last_name)
+        self.assertEqual(response.data["avatar"], self.user.avatar)
+
+    def test_get_public_profile_not_found(self):
+        request = self.factory.get("/api/accounts/user/999", format="json")
+        force_authenticate(request, user=self.user)
+        response = PublicUserProfileView.as_view()(request, pk=999)
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_public_profile_with_show_email_false(self):
+        request = self.factory.get(f"/api/accounts/user/{self.user.id}", format="json")
+        force_authenticate(request, user=self.user)
+        response = PublicUserProfileView.as_view()(request, pk=self.user.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], None)
+
+    def test_get_public_profile_with_show_email_true(self):
+        self.user.show_email = True
+        self.user.save()
+        request = self.factory.get(f"/api/accounts/user/{self.user.id}", format="json")
+        force_authenticate(request, user=self.user)
+        response = PublicUserProfileView.as_view()(request, pk=self.user.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], self.user.email)
 
 
 class ProfileUpdateTests(TestCase):
