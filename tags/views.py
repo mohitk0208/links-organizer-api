@@ -22,7 +22,9 @@ class TagViewSet(
     viewsets.GenericViewSet,
 ):
     serializer_class = TagDetailSerializer
+    ordering = "-created_at"
     pagination_class = CustomLimitOffsetPagination
+    ordering_fields = ("created_at", "updated_at", "name")
 
     def get_queryset(self):
         if self.action == "retrieve":

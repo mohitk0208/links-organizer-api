@@ -33,6 +33,7 @@ class CategoryCreateApiTests(TestCase):
         force_authenticate(request, user=self.user)
         response = CategoryViewSet.as_view({"post": "create"})(request)
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(Category.objects.count(), 1)
         self.assertEqual(response.data["name"], request_data["name"])
         self.assertEqual(response.data["description"], request_data["description"])
         self.assertEqual(response.data["background_url"], request_data["background_url"])
