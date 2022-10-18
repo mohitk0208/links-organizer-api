@@ -21,7 +21,7 @@ tblib = "*"
 [dev-packages]
 ipython = "*"
 pre-commit = "*"
-black = "==21.9b0"
+black = "==22.3.0"
 isort = "*"
 redgreenunittest = "*"
 
