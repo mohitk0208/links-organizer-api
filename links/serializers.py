@@ -1,13 +1,15 @@
 from rest_framework import serializers
 
-from .models import Link
+from categories.models import Category
 from tags.serializers import TagSerializer
+
+from .models import Link
 
 
 class LinkSerializer(serializers.ModelSerializer):
-    owner__username = serializers.ReadOnlyField(source='owner.username')
-    owner__avatar = serializers.ReadOnlyField(source='owner.avatar')
-    category__background_url = serializers.ReadOnlyField(source='category.background_url')
+    owner_username = serializers.ReadOnlyField(source='owner.username')
+    owner_avatar = serializers.ReadOnlyField(source='owner.avatar')
+    category_background_url = serializers.ReadOnlyField(source='category.background_url')
     # tags = TagSerializer(many=True)
 
     def to_representation(self, instance):
@@ -21,13 +23,27 @@ class LinkSerializer(serializers.ModelSerializer):
           'id',
           'url',
           'category',
-          'category__background_url',
+          'category_background_url',
           'description',
           'owner',
-          'owner__username',
-          'owner__avatar',
+          'owner_username',
+          'owner_avatar',
           'tags',
           'created_at',
           'updated_at',
         )
         read_only_fields = ('id', 'created_at', 'updated_at', 'owner')
+
+    def validate(self, attrs):
+        try:
+            link = Link.objects.get(url=attrs["url"], owner=self.context["request"].user)
+            raise serializers.ValidationError({"url": ("This URL is already in use.")})
+        except Link.DoesNotExist:
+            pass
+
+        try:
+            category = Category.objects.get(id=attrs["category"].id, owner=self.context["request"].user)
+        except Category.DoesNotExist:
+            raise serializers.ValidationError({"category": ["Category does not exist."]})
+
+        return attrs

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -15,6 +16,18 @@ class Link(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['url', 'owner'], name='unique_link_owner')
         ]
+
+    def clean(self, *args, **kwargs):
+        if self.category.owner != self.owner:
+            raise ValidationError({"category": ["category does not exist."]})
+
+        super().clean(*args, **kwargs)
+
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+
+        super().save(*args, **kwargs)
 
     def get_category(self):
         return self.category
