@@ -392,7 +392,6 @@ class LinkModelTestCases(TestCase):
     def test_create_link_in_category_of_different_user(self):
         try:
             link = Link.objects.create(url="https://linkexampleds.com", description="somec", owner=self.user, category=self.category2)
-            self.assertTrue(False)
         except ValidationError as e:
             self.assertTrue(True)
 
