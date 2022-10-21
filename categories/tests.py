@@ -57,8 +57,6 @@ class CategoryCreateApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["name"][0], "Category already exists")
 
-
-
     def test_same_category_name_different_owner(self):
         request_data = {
             "name": "category1",
@@ -157,7 +155,6 @@ class CategoryListApiTests(TestCase):
         self.assertEqual(response.data["results"][1]["id"], self.category2.id)
         self.assertEqual(response.data["results"][2]["id"], self.category3.id)
 
-
 class CategoryDetailApiTests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -202,7 +199,6 @@ class CategoryDetailApiTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-
     def test_update_category(self):
         updated_data = {
             "name": "new_name",
@@ -225,7 +221,6 @@ class CategoryDetailApiTests(TestCase):
         self.assertEqual(response.data["owner_avatar"], self.category1.owner.avatar)
         self.assertEqual(response.data["shared_users"], [])
 
-
     def test_partial_update_category(self):
         updated_data = {
             "description": "This is updated description."
@@ -246,6 +241,17 @@ class CategoryDetailApiTests(TestCase):
         self.assertEqual(response.data["owner_avatar"], self.category1.owner.avatar)
         self.assertEqual(response.data["shared_users"], [])
 
+    def test_make_category_as_parent_of_itself(self):
+        updated_data = {
+            "parent_category": self.category1.id
+        }
+        request = self.factory.patch(f"/api/categories/{self.category1.id}/", updated_data,format="json")
+        force_authenticate(request, user=self.user)
+        response = CategoryViewSet.as_view({"patch":"partial_update"})(request, pk=self.category1.id)
+
+        self.category1 = Category.objects.get(id=self.category1.id)
+
+        self.assertEqual(response.status_code, 400)
 
 
     def test_delete_category(self):
@@ -260,3 +266,31 @@ class CategoryDetailApiTests(TestCase):
             self.category1 = None
 
         self.assertEqual(self.category1, None)
+
+
+class CategoryModelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username= "test",
+            password="test",
+            email="test@test.com",
+            first_name="test"
+        )
+        self.category1 = Category.objects.create(name="Category1", description="some description", background_url="https://example.com/400", owner=self.user)
+
+    def test_string_representation_of_category(self):
+        self.assertEqual(str(self.category1), self.category1.name)
+
+    def test_get_category_function(self):
+        self.assertEqual(self.category1, self.category1.get_category())
+
+    def test_parent_category_is_itself(self):
+        self.category2 = Category.objects.create(name="Category2", description="snkjd", background_url="https://exampleimage.com/400", owner=self.user)
+        try:
+            self.category2.parent_category = self.category2
+            self.category2.save()
+        except:
+            pass
+        else:
+            self.fail()
+
