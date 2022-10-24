@@ -25,6 +25,9 @@ class LinksViewSet(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Link.objects.none()
+
         if self.action != "list":
             return Link.objects.filter(owner=self.request.user).prefetch_related("tags")
 

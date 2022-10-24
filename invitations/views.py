@@ -19,16 +19,6 @@ from .serializers import (
 )
 
 
-class BaseCategoryInvitationViewSet(
-    GetSerializerClassMixin,
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet,
-):
-    pass
-
-
 class CategoryInvitationSenderViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -39,10 +29,19 @@ class CategoryInvitationSenderViewSet(
     serializer_class = CategoryInvitationSenderSerializer
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return CategoryInvitation.objects.none()
+
         return CategoryInvitation.objects.filter(sender=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
+
+    def perform_destroy(self, instance):
+        if instance.is_accepted is not None:
+            raise ValidationError({"is_accepted": ("Invitation must not be accepted or declined to be deleted.")})
+
+        instance.delete()
 
 
 
@@ -54,6 +53,9 @@ class CategoryInvitationReceiverViewSet(
     serializer_class = CategoryInvitationReceiverSerializer
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return CategoryInvitation.objects.none()
+
         return CategoryInvitation.objects.filter(receiver=self.request.user)
 
 

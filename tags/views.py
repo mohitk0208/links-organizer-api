@@ -27,6 +27,9 @@ class TagViewSet(
     ordering_fields = ("created_at", "updated_at", "name")
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Tag.objects.none()
+
         if self.action == "retrieve":
             return Tag.objects.all()
 
