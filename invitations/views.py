@@ -8,7 +8,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 
-from categories.models import Category
+from categories.models import Category, CategoryAccess
 from links_organizer_api.utils.mixins import GetSerializerClassMixin
 from links_organizer_api.utils.serializers import EmptySerializer
 
@@ -46,11 +46,16 @@ class CategoryInvitationSenderViewSet(
 
 
 class CategoryInvitationReceiverViewSet(
+    GetSerializerClassMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     serializer_class = CategoryInvitationReceiverSerializer
+    serializer_action_classes = {
+        "accept": EmptySerializer,
+        "reject": EmptySerializer
+    }
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
@@ -68,15 +73,18 @@ class CategoryInvitationReceiverViewSet(
     @action(detail=True, methods=["post"])
     def accept(self, request, pk=None):
         """Accept invitation"""
-        # invitation = self.get_object()
-        # if invitation.is_accepted is not None:
-        #     raise ValidationError("Already responded to invitation")
+        invitation = self.get_object()
 
-        # invitation.is_accepted = True
-        # invitation_category = Category.objects.get(id=invitation.category.id)
-        # invitation_category.shared_users.add(invitation.receiver)
-        # invitation_category.save()
-        # invitation.save()
+        # invitation already responded
+        if invitation.is_accepted is not None:
+            raise ValidationError({"detail": "invitation already responded."})
+
+        # create a category access
+        category_access = CategoryAccess.objects.create(user=invitation.receiver, category=invitation.category, level=invitation.access_level)
+        category_access.save()
+
+        invitation.is_accepted = True
+        invitation.save()
 
         return Response(status=status.HTTP_200_OK)
 
@@ -87,12 +95,12 @@ class CategoryInvitationReceiverViewSet(
     @action(detail=True, methods=["post"])
     def reject(self, request, pk=None):
         """Reject invitation"""
-        # invitation = self.get_object()
-        # if invitation.is_accepted is not None:
-        #     raise ValidationError("Already responded to invitation")
+        invitation = self.get_object()
+        if invitation.is_accepted is not None:
+            raise ValidationError("Already responded to invitation")
 
-        # invitation.is_accepted = False
-        # invitation.save()
+        invitation.is_accepted = False
+        invitation.save()
 
         return Response(status=status.HTTP_200_OK)
 

@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
+from categories.models import CategoryAccess
+
 from .models import CategoryInvitation
 
 
@@ -54,6 +56,12 @@ class BasicCategoryInvitationSerializer(serializers.ModelSerializer):
         if attrs["category"].owner.id != self.context["request"].user.id:
             raise ValidationError({"detail": ("Category does not exist")})
 
+        # category already shared
+        try:
+            _ = CategoryAccess.objects.get(user=attrs["receiver"], category=attrs["category"])
+            raise ValidationError({"detail": ("category already shared to the user")})
+        except CategoryAccess.DoesNotExist :
+            pass
 
         return attrs
 

@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import User
-from categories.models import AccessLevel, Category
+from categories.models import AccessLevel, Category, CategoryAccess
 from invitations.models import CategoryInvitation
 from invitations.views import (
     CategoryInvitationReceiverViewSet,
@@ -128,26 +128,24 @@ class InvitationCreateApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(CategoryInvitation.objects.count(), 0)
 
-    # TODO
+    def test_create_invitation_when_receiver_exists_in_the_shared_users(self):
+        category_access =  CategoryAccess.objects.create(user=self.user2, category=self.category, level=AccessLevel.READ_WRITE)
+        category_access.save()
 
-    # def test_create_invitation_when_receiver_exists_in_the_shared_users(self):
-    #     self.category.shared_users.add(self.user2)
-    #     self.category.save()
+        request_data = {
+            "category": self.category.id,
+            "receiver": self.user2.id,
+            "note": "I and Test, collaborate to create a better collection.",
+            "access_level": AccessLevel.READ_WRITE
+        }
 
-    #     request_data = {
-    #         "category": self.category.id,
-    #         "receiver": self.user2.id,
-    #         "note": "I and Test, collaborate to create a better collection.",
-    #         "access_level": AccessLevel.READ_WRITE
-    #     }
+        request = self.factory.post("/sender_category_invitations/", request_data, format="json")
+        force_authenticate(request, user=self.user)
 
-    #     request = self.factory.post("/sender_category_invitations/", request_data, format="json")
-    #     force_authenticate(request, user=self.user)
+        response = CategoryInvitationSenderViewSet.as_view({"post": "create"})(request)
 
-    #     response = CategoryInvitationSenderViewSet.as_view({"post": "create"})(request)
-
-    #     self.assertEqual(response.status_code, 400)
-    #     self.assertEqual(CategoryInvitation.objects.count(), 0)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(CategoryInvitation.objects.count(), 0)
 
 
 class InvitationModelTests(TestCase):
@@ -363,5 +361,30 @@ class InvitationDetailApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(CategoryInvitation.objects.count(), total_invitations)
 
+    def test_accept_invitation(self):
+        request = self.factory.post(f"/receiver_category_invitations/{self.invitation1.id}/accept/", {}, format="json")
+        force_authenticate(request, user= self.user2)
 
-    # TODO : test_cases for accept and decline requests
+        response = CategoryInvitationReceiverViewSet.as_view({"post": "accept"})(request, pk=self.invitation1.id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.user2 in self.category1.shared_users.all())
+
+
+    def test_accept_invitation_different_user(self):
+        request = self.factory.post(f"/receiver_category_invitations/{self.invitation1.id}/accept/", {}, format="json")
+        force_authenticate(request, user= self.user3)
+
+        response = CategoryInvitationReceiverViewSet.as_view({"post": "accept"})(request, pk=self.invitation1.id)
+
+        self.assertEqual(response.status_code, 404)
+
+
+    def test_decline_invitation(self):
+        request = self.factory.post(f"/receiver_category_invitations/{self.invitation1.id}/reject/", {}, format="json")
+        force_authenticate(request, user= self.user2)
+
+        response = CategoryInvitationReceiverViewSet.as_view({"post": "reject"})(request, pk=self.invitation1.id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(self.user2 in self.category1.shared_users.all())
