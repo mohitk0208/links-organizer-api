@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .models import AccessLevel, Category, CategoryAccess
 
@@ -6,12 +7,19 @@ from .models import AccessLevel, Category, CategoryAccess
 class CategoryAccessSerializer(serializers.ModelSerializer):
     user_avatar = serializers.ReadOnlyField(source="user.avatar")
     username = serializers.ReadOnlyField(source="user.username")
-    user_id = serializers.ReadOnlyField(source="user.id")
 
     class Meta:
         model = CategoryAccess
-        fields = ("id", "user_id", "user_avatar", "username", "level")
-        extra_kwargs = {"level": {"required": True}}
+        fields = (
+            "id",
+            "user",
+            "user_avatar",
+            "username",
+            "category",
+            "level"
+        )
+
+        read_only_fields = ("id", "user", "category")
 
 
 class CategorySerializer(serializers.ModelSerializer):
