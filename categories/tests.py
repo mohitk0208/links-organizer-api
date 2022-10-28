@@ -6,7 +6,11 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import User
 from categories.models import AccessLevel, Category, CategoryAccess
-from categories.views import CategoryAccessViewSet, CategoryViewSet
+from categories.views import (
+    CategoryAccessViewSet,
+    CategoryViewSet,
+    SharedCategoryViewSet,
+)
 
 User: User = get_user_model()
 
@@ -369,4 +373,37 @@ class CategoryAccessApiTests(TestCase):
         self.assertEqual(len(self.category1.shared_users.all()), 1)
 
 
+class SharedCategoryAPiTests(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user1 = User.objects.create_user(
+            username= "test",
+            password="test",
+            email="test@test.com",
+            first_name="test"
+        )
+        self.user2 = User.objects.create_user(
+            username= "test2",
+            password="test2",
+            email="test2@test.com",
+            first_name="test2"
+        )
+        self.category1 = Category.objects.create(name="Category1", description="some description", background_url="https://example.com/400", owner=self.user1)
+        self.category2 = Category.objects.create(name="Category2", description="snkjd", background_url="https://exampleimage.com/400", owner=self.user1)
+        self.category3 = Category.objects.create(name="Category3", description="snkjdcsd", background_url="https://exampleimage.com/403", owner=self.user1)
 
+        self.category_access1 = CategoryAccess.objects.create(user=self.user2, category=self.category1, level=AccessLevel.READ_ONLY)
+        self.category_access2 = CategoryAccess.objects.create(user=self.user2, category=self.category2, level=AccessLevel.READ_ONLY)
+
+
+    def test_get_shared_categories(self):
+        request = self.factory.get("/api/shared_categories/",format="json")
+        force_authenticate(request, user=self.user2)
+
+        response = SharedCategoryViewSet.as_view({"get":"list"})(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(response.data["results"]), 2)
+        self.assertEqual(response.data["results"][0]["id"], self.category1.id )
+        self.assertEqual(response.data["results"][1]["id"], self.category2.id )
