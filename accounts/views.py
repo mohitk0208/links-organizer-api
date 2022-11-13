@@ -45,8 +45,8 @@ class UserListView(ListAPIView):
 
     serializer_class = PublicUserSerializer
     ordering = ('first_name', 'email', 'username')
-    filter_fields = ('first_name', 'email', 'username')
-    search_fields = ('first_name', 'username')
+    filter_fields = ('email', 'username')
+    search_fields = ('username', 'email')
     ordering_fields = ('first_name', 'email', 'username')
 
     def get_queryset(self):
